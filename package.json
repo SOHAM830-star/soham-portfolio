@@ -1,0 +1,14 @@
+﻿{
+  "name": "soham-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Soham A. Chavan developer portfolio with Node.js inquiry backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

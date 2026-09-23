@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soham A. Chavan | Computer Engineering Student & Full-Stack Developer</title>
+  <meta name="description" content="Portfolio of Soham A. Chavan, a Computer Engineering student and Full-Stack Developer from Pune, India, building practical digital experiences with web technologies, AI, and automation.">
+  <meta name="keywords" content="Soham A Chavan, Full-Stack Developer, Computer Engineering Student, JavaScript, Python, React, Flask, AI-assisted development, Pune">
+  <meta name="author" content="Soham A. Chavan">
+  
+  <!-- Open Graph / Meta -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Soham A. Chavan | Full-Stack Developer">
+  <meta property="og:description" content="Computer Engineering student building practical digital experiences across frontend, backend, AI, and automation.">
+  <meta property="og:image" content="assets/project-1.jpg">
+  <meta name="theme-color" content="#07090e">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23080a11' stroke='%2300f0ff' stroke-width='8'/><text x='50%' y='58%' text-anchor='middle' fill='%2300f0ff' font-family='sans-serif' font-size='42' font-weight='900'>AC</text></svg>">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Dynamic Interactive Backgrounds -->
+  <canvas id="bg-canvas"></canvas>
+  <div class="cursor-spotlight"></div>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Floating Navigation GUI -->
+  <header class="navbar-wrapper">
+    <nav class="navbar" id="main-nav">
+      <a href="#hero" class="nav-brand">
+        <span class="brand-mark">AC</span>
+        <span class="brand-name">Soham A. Chavan</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#skills" class="nav-link">Skills</a></li>
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#codelab" class="nav-link">Code Lab</a></li>
+        <li><a href="#experience" class="nav-link">Experience</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Inquiries / Submissions Vault Button -->
+        <button class="vault-btn" id="open-vault-btn" title="View Submissions & Download Files" aria-label="Open Inquiries Vault">
+          <span class="vault-icon" aria-hidden="true">▰</span>
+          <span class="vault-label">Vault</span>
+          <span class="vault-badge" id="vault-counter">0</span>
+        </button>
+
+        <!-- Web Audio Synthesizer Toggle -->
+        <button class="sound-toggle-btn" id="sound-toggle" title="Toggle Synthesized Audio Feedback" aria-label="Toggle UI Sound Effects">
+          <div class="sound-bars">
+            <span class="sound-bar"></span>
+            <span class="sound-bar"></span>
+            <span class="sound-bar"></span>
+          </div>
+          <span class="sound-status">SFX ON</span>
+        </button>
+
+        <!-- Availability Status Pill -->
+        <a href="#contact" class="hire-badge">
+          <span class="pulse-dot"></span>
+          <span>Learning + Building</span>
+        </a>
+
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="hero">
+      <div class="container">
+        <div class="hero-grid">
+          
+          <!-- Hero Text & CTA -->
+          <div class="hero-content reveal-init">
+                <div class="hero-tag">
+                  <span class="hero-tag-glow">✦ SOHAM.A.CHAVAN</span>
+                  <span>• COMPUTER ENGINEERING STUDENT</span>
+            </div>
+
+            <h1 class="hero-title">
+                  I Build <span class="gradient-text">Digital Experiences</span> That Solve Real Problems.
+            </h1>
+
+            <p class="hero-subtitle">
+                  Computer Engineering student and Full-Stack Developer from Pune, India, focused on building practical web applications while exploring AI-assisted development, automation, and creative technology.
+            </p>
+
+            <div class="hero-cta-group">
+              <a href="#projects" class="btn btn-primary">
+                <span>Explore My Work</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </a>
+
+              <a href="#contact" class="btn btn-glass">
+                <span>Let’s Connect</span>
+              </a>
+            </div>
+
+            <!-- Metric Counter Strip -->
+            <div class="hero-metrics">
+              <div class="metric-item">
+                <h4>01</h4>
+                <p>Featured Project</p>
+              </div>
+              <div class="metric-item">
+                <h4>07+</h4>
+                <p>Core Languages</p>
+              </div>
+              <div class="metric-item">
+                <h4>∞</h4>
+                <p>Curiosity to Learn</p>
+              </div>
+              <div class="metric-item">
+                <h4>24/7</h4>
+                <p>Build • Test • Improve</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Developer CLI Terminal -->
+          <div class="hero-terminal-wrapper reveal-init" data-tilt>
+            <div class="terminal-window">
+              <div class="terminal-header">
+                <div class="terminal-controls">
+                  <span class="term-btn term-close"></span>
+                  <span class="term-btn term-min"></span>
+                  <span class="term-btn term-max"></span>
+                </div>
+                <div class="terminal-title">soham@dev-lab: ~/portfolio (zsh)</div>
+                <div class="terminal-actions">
+                  <span class="term-tag">v2026.4.1-lts</span>
+                </div>
+              </div>
+
+              <div class="terminal-body" id="terminal-body">
+                <div id="terminal-output"></div>
+
+                <div class="terminal-input-row">
+                  <span class="term-prompt">soham@dev-lab:~$</span>
+                  <input type="text" id="terminal-input" class="terminal-input" placeholder="type 'help' or click chips below..." autocomplete="off" spellcheck="false">
+                </div>
+              </div>
+
+              <!-- Quick Command Chips Strip -->
+              <div class="term-chips-strip">
+                <button class="term-chip" data-cmd="skills">⚡ skills</button>
+                <button class="term-chip" data-cmd="projects">🚀 projects</button>
+                <button class="term-chip" data-cmd="stats">📊 stats</button>
+                <button class="term-chip" data-cmd="hire">💼 hire</button>
+                <button class="term-chip" data-cmd="bio">👤 bio</button>
+                <button class="term-chip" data-cmd="clear">🧹 clear</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT & ARCHITECTURE SECTION -->
+    <section class="about-section" id="about">
+      <div class="container">
+        <div class="section-header reveal-init">
+          <div class="section-tag">ABOUT ME</div>
+          <h2 class="section-title">Learning, Building, and <span class="gradient-text">Solving Problems</span></h2>
+          <p class="section-desc">I build practical, modern digital experiences while growing from Computer Engineering student into a thoughtful Full-Stack Developer.</p>
+        </div>
+
+        <div class="about-grid">
+          
+          <!-- Avatar Card with 3D Tilt -->
+          <div class="avatar-card-wrapper reveal-init" data-tilt>
+            <div class="avatar-card">
+              <div class="avatar-image-container">
+                <div class="avatar-glow-ring"></div>
+                <img src="assets/avatar.jpg" alt="Soham A. Chavan - Computer Engineering Student and Full-Stack Developer" class="avatar-img">
+              </div>
+
+              <h3 class="avatar-name">Soham A. Chavan</h3>
+              <p class="avatar-role">Computer Engineering Student | Full-Stack Developer</p>
+
+              <div class="avatar-socials">
+                <a href="https://github.com/SOHAM830-star" target="_blank" rel="noopener" class="social-pill-btn" title="GitHub">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                </a>
+                <a href="https://www.linkedin.com/in/soham-chavan-83034b37a" target="_blank" rel="noopener" class="social-pill-btn" title="LinkedIn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                </a>
+                <a href="#portfolio-contact-form" class="social-pill-btn" title="Contact Soham">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Architecture Tenets Cards -->
+          <div class="about-content reveal-init">
+            <div class="tenets-grid">
+              
+              <div class="tenet-card" data-tilt>
+                <div class="tenet-icon">⚡</div>
+                <h3 class="tenet-title">Problem Solving</h3>
+                <p class="tenet-desc">Breaking complex programming problems into manageable solutions and turning ideas into useful applications.</p>
+              </div>
+
+              <div class="tenet-card" data-tilt>
+                <div class="tenet-icon">🎨</div>
+                <h3 class="tenet-title">Continuous Learning</h3>
+                <p class="tenet-desc">Actively learning frameworks, tools, and development practices through projects, experiments, and real-world problem solving.</p>
+              </div>
+
+              <div class="tenet-card" data-tilt>
+                <div class="tenet-icon">🧠</div>
+                <h3 class="tenet-title">Full-Stack Mindset</h3>
+                <p class="tenet-desc">Interested in the complete journey from a clear frontend experience to useful backend functionality and REST APIs.</p>
+              </div>
+
+              <div class="tenet-card" data-tilt>
+                <div class="tenet-icon">🛡️</div>
+                <h3 class="tenet-title">AI-Assisted Development</h3>
+                <p class="tenet-desc">Using GitHub Copilot and AI workflows to understand code, troubleshoot errors, develop features, and prototype faster.</p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS MATRIX SECTION -->
+    <section class="skills-section" id="skills">
+      <div class="container">
+        <div class="section-header reveal-init">
+          <div class="section-tag">TECHNICAL CAPABILITIES</div>
+          <h2 class="section-title">The Tools I Use to <span class="gradient-text">Build and Learn</span></h2>
+          <p class="section-desc">A growing stack across programming, web development, backend systems, databases, design tools, and AI-assisted workflows.</p>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="skills-filter-nav reveal-init">
+          <button class="filter-btn active" data-filter="all">All Disciplines</button>
+          <button class="filter-btn" data-filter="programming">Programming</button>
+          <button class="filter-btn" data-filter="frontend">Frontend</button>
+          <button class="filter-btn" data-filter="backend">Backend</button>
+          <button class="filter-btn" data-filter="tools">Tools</button>
+          <button class="filter-btn" data-filter="exploring">Exploring</button>
+        </div>
+
+        <!-- Skills Grid -->
+        <div class="skills-grid">
+          
+          <div class="skill-card reveal-init" data-category="programming" data-tilt>
+            <div class="skill-header">
+              <div class="skill-icon-wrap">⚛️</div>
+              <span class="skill-level-badge">CORE</span>
+            </div>
+            <h3 class="skill-title">C, C++, Python</h3>
+            <p class="skill-meta">Programming fundamentals, object-oriented programming, and problem solving</p>
+            <div class="skill-progress-bar">
+              <div class="skill-fill" data-level="72%"></div>
+            </div>
+          </div>
+
+          <div class="skill-card reveal-init" data-category="frontend" data-tilt>
+            <div class="skill-header">
+              <div class="skill-icon-wrap">🔷</div>
+              <span class="skill-level-badge">CORE</span>
+            </div>
+            <h3 class="skill-title">JavaScript, HTML, CSS</h3>
+            <p class="skill-meta">Frontend foundations for responsive and interactive web experiences</p>
+            <div class="skill-progress-bar">
+              <div class="skill-fill" data-level="78%"></div>
+            </div>
+          </div>
+
+          <div class="skill-card reveal-init" data-category="frontend" data-tilt>
+            <div class="skill-header">
+              <div class="skill-icon-wrap">🎮</div>
+              <span class="skill-level-badge">BUILDING</span>
+            </div>
+            <h3 class="skill-title">React</h3>
+            <p class="skill-meta">Currently learning component-based interfaces and modern frontend development</p>
+            <div class="skill-progress-bar">
+              <div class="skill-fill" data-level="58%"></div>
+            </div>
+          </div>
+
+          <div class="skill-card reveal-init" data-category="backend" data-tilt>
+            <div class="skill-header">
+              <div class="skill-icon-wrap">🦀</div>
+              <span class="skill-level-badge">BUILDING</span>
+            </div>
+            <h3 class="skill-title">Flask & REST APIs</h3>
+            <p class="skill-meta">Python-based backend integration for practical full-stack applications</p>
+            <div class="skill-progress-bar">
+              <div class="skill-fill" data-level="62%"></div>
+            </div>
+          </div>
+
+          <div class="skill-card reveal-init" data-category="backend" data-tilt>
+            <div class="skill-header">
+              <div class="skill-icon-wrap">🟢</div>
+              <span class="skill-level-badge">CORE</span>
+            </div>
+            <h3 class="skill-title">SQL & Databases</h3>
+            <p class="skill-meta">Database management concepts, queries, and structured application data</p>
+            <div class="skill-progress-bar">
+              <div class="skill-fill" data-level="60%"></div>
+            </div>
+          </div>
+
+          <div class="skill-card reveal-init" data-category="exploring" data-tilt>
+            <div class="skill-header">
+              <div class="skill-icon-wrap">🤖</div>
+              <span class="skill-level-badge">EXPLORING</span>
+            </div>
+            <h3 class="skill-title">AI & Automation</h3>
+            <p class="skill-meta">Basic machine learning concepts and AI-assisted development workflows</p>
+            <div class="skill-progress-bar">
+              <div class="skill-fill" data-level="45%"></div>
+            </div>
+          </div>
+
+          <div class="skill-card reveal-init" data-category="tools" data-tilt>
+            <div class="skill-header">
+              <div class="skill-icon-wrap">☸️</div>
+              <span class="skill-level-badge">TOOLS</span>
+            </div>
+            <h3 class="skill-title">Git, GitHub & VS Code</h3>
+            <p class="skill-meta">Version control, collaboration, debugging, and everyday development workflow</p>
+            <div class="skill-progress-bar">
+              <div class="skill-fill" data-level="70%"></div>
+            </div>
+          </div>
+
+          <div class="skill-card reveal-init" data-category="tools" data-tilt>
+            <div class="skill-header">
+              <div class="skill-icon-wrap">⚡</div>
+              <span class="skill-level-badge">TOOLS</span>
+            </div>
+            <h3 class="skill-title">Canva, Figma & Copilot</h3>
+            <p class="skill-meta">Visual design, interface exploration, and AI-assisted learning and prototyping</p>
+            <div class="skill-progress-bar">
+              <div class="skill-fill" data-level="66%"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- FLAGSHIP PROJECTS SHOWCASE -->
+    <section class="projects-section" id="projects">
+      <div class="container">
+        <div class="section-header reveal-init">
+          <div class="section-tag">PROJECTS & PRACTICE</div>
+          <h2 class="section-title">Building Through <span class="gradient-text">Real Projects</span></h2>
+          <p class="section-desc">A focused look at the work and experiments shaping my journey toward Full-Stack Development.</p>
+        </div>
+
+        <div class="projects-grid">
+          
+          <!-- Project 1 -->
+          <article class="project-card reveal-init" data-tilt>
+            <div class="project-visual open-modal-trigger" data-project="1">
+              <img src="assets/project-1.jpg" alt="Smart Campus Management System" class="project-img">
+              <div class="project-overlay">
+                <span class="project-view-badge">🔍 Click to inspect deep architecture</span>
+              </div>
+            </div>
+
+            <div class="project-info">
+              <span class="project-tag">EDUCATION TECHNOLOGY</span>
+              <h3 class="project-title">Smart Campus Management System</h3>
+              <p class="project-desc">
+                A smart campus platform designed to manage classroom occupancy, allocation, attendance, and notifications for students and teachers.
+              </p>
+
+              <div class="project-metrics-strip">
+                <div>
+                  <div class="p-metric-val">2</div>
+                  <div class="p-metric-label">User Modules</div>
+                </div>
+                <div>
+                  <div class="p-metric-val">01</div>
+                  <div class="p-metric-label">Campus Platform</div>
+                </div>
+                <div>
+                  <div class="p-metric-val">∞</div>
+                  <div class="p-metric-label">Learning Value</div>
+                </div>
+              </div>
+
+              <div class="project-stack">
+                <span class="stack-tag">HTML</span>
+                <span class="stack-tag">CSS</span>
+                <span class="stack-tag">JavaScript</span>
+                <span class="stack-tag">Python</span>
+                <span class="stack-tag">Flask</span>
+              </div>
+
+              <div class="project-actions">
+                <button class="btn btn-primary open-modal-trigger" data-project="1">
+                  <span>View Project Focus</span>
+                </button>
+                <a href="#contact" class="btn btn-glass">
+                  <span>Discuss the Build</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 2 -->
+          <article class="project-card reversed reveal-init" data-tilt>
+            <div class="project-visual open-modal-trigger" data-project="2">
+              <img src="assets/project-2.jpg" alt="AI-assisted development workflow" class="project-img">
+              <div class="project-overlay">
+                <span class="project-view-badge">🔍 Click to inspect deep architecture</span>
+              </div>
+            </div>
+
+            <div class="project-info">
+              <span class="project-tag">DEVELOPMENT WORKFLOW</span>
+              <h3 class="project-title">AI-Assisted Development</h3>
+              <p class="project-desc">
+                I use GitHub Copilot and AI-assisted workflows to understand code, troubleshoot errors, develop features, and accelerate learning and prototyping.
+              </p>
+
+              <div class="project-metrics-strip">
+                <div>
+                  <div class="p-metric-val">01</div>
+                  <div class="p-metric-label">Workflow</div>
+                </div>
+                <div>
+                  <div class="p-metric-val">24/7</div>
+                  <div class="p-metric-label">Learning Mode</div>
+                </div>
+                <div>
+                  <div class="p-metric-val">∞</div>
+                  <div class="p-metric-label">Ideas Tested</div>
+                </div>
+              </div>
+
+              <div class="project-stack">
+                <span class="stack-tag">GitHub Copilot</span>
+                <span class="stack-tag">VS Code</span>
+                <span class="stack-tag">JavaScript</span>
+                <span class="stack-tag">Python</span>
+                <span class="stack-tag">Problem Solving</span>
+              </div>
+
+              <div class="project-actions">
+                <button class="btn btn-primary open-modal-trigger" data-project="2">
+                  <span>View Workflow</span>
+                </button>
+                <a href="#contact" class="btn btn-glass">
+                  <span>Start a Conversation</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Project 3 -->
+          <article class="project-card reveal-init" data-tilt>
+            <div class="project-visual open-modal-trigger" data-project="3">
+              <img src="assets/project-3.jpg" alt="Full-Stack development learning track" class="project-img">
+              <div class="project-overlay">
+                <span class="project-view-badge">🔍 Click to inspect deep architecture</span>
+              </div>
+            </div>
+
+            <div class="project-info">
+              <span class="project-tag">CURRENTLY LEARNING</span>
+              <h3 class="project-title">Full-Stack Development Journey</h3>
+              <p class="project-desc">
+                I am growing from frontend foundations into complete applications, connecting React interfaces with Python, Flask, REST APIs, and SQL-backed data.
+              </p>
+
+              <div class="project-metrics-strip">
+                <div>
+                  <div class="p-metric-val">04</div>
+                  <div class="p-metric-label">Focus Areas</div>
+                </div>
+                <div>
+                  <div class="p-metric-val">∞</div>
+                  <div class="p-metric-label">Experiments</div>
+                </div>
+                <div>
+                  <div class="p-metric-val">NOW</div>
+                  <div class="p-metric-label">In Progress</div>
+                </div>
+              </div>
+
+              <div class="project-stack">
+                <span class="stack-tag">React</span>
+                <span class="stack-tag">Python</span>
+                <span class="stack-tag">Flask</span>
+                <span class="stack-tag">REST APIs</span>
+                <span class="stack-tag">SQL</span>
+              </div>
+
+              <div class="project-actions">
+                <button class="btn btn-primary open-modal-trigger" data-project="3">
+                  <span>View Learning Path</span>
+                </button>
+                <a href="#contact" class="btn btn-glass">
+                  <span>Connect on GitHub</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE CODE LAB SECTION -->
+    <section class="codelab-section" id="codelab">
+      <div class="container">
+        <div class="section-header reveal-init">
+          <div class="section-tag">LIVE ARCHITECTURE LAB</div>
+          <h2 class="section-title">Inspect the <span class="gradient-text">Core Engineering Syntax</span></h2>
+          <p class="section-desc">Real production snippet architectures showcasing reactive pipelines, zero-copy buffers, and distributed state.</p>
+        </div>
+
+        <div class="codelab-container reveal-init">
+          <div class="codelab-topbar">
+            <div class="codelab-tabs">
+              <button class="code-tab active" data-target="code-ts">
+                <span>📄 useReactiveStream.ts</span>
+              </button>
+              <button class="code-tab" data-target="code-rust">
+                <span>🦀 ring_buffer.rs</span>
+              </button>
+              <button class="code-tab" data-target="code-python">
+                <span>🐍 inference_orchestrator.py</span>
+              </button>
+            </div>
+
+            <div class="codelab-controls">
+              <button class="code-action-btn" id="run-code-btn" title="Run Benchmark">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Run Benchmark</span>
+              </button>
+              <button class="code-action-btn" id="copy-code-btn" title="Copy to Clipboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="codelab-body">
+            
+            <!-- Code Tab 1 -->
+            <div class="code-block active" id="code-ts">
+              <pre><code><span class="tok-kw">import</span> { <span class="tok-var">useEffect</span>, <span class="tok-var">useRef</span>, <span class="tok-var">useCallback</span> } <span class="tok-kw">from</span> <span class="tok-str">'react'</span>;
+
+<span class="tok-cm">// Zero-copy WebSocket telemetry stream receiver with binary chunking</span>
+<span class="tok-kw">export function</span> <span class="tok-fn">useReactiveStream</span>&lt;<span class="tok-type">T</span>&gt;(<span class="tok-var">endpoint</span>: <span class="tok-type">string</span>, <span class="tok-var">onFrame</span>: (<span class="tok-var">data</span>: <span class="tok-type">T</span>) =&gt; <span class="tok-type">void</span>) {
+  <span class="tok-kw">const</span> <span class="tok-var">socketRef</span> = <span class="tok-fn">useRef</span>&lt;<span class="tok-type">WebSocket</span> | <span class="tok-type">null</span>&gt;(<span class="tok-kw">null</span>);
+
+  <span class="tok-fn">useEffect</span>(() =&gt; {
+    <span class="tok-kw">const</span> <span class="tok-var">ws</span> = <span class="tok-kw">new</span> <span class="tok-fn">WebSocket</span>(<span class="tok-var">endpoint</span>);
+    <span class="tok-var">ws</span>.<span class="tok-var">binaryType</span> = <span class="tok-str">'arraybuffer'</span>;
+
+    <span class="tok-var">ws</span>.<span class="tok-var">onmessage</span> = (<span class="tok-var">event</span>: <span class="tok-type">MessageEvent</span>) =&gt; {
+      <span class="tok-kw">const</span> <span class="tok-var">buffer</span> = <span class="tok-kw">new</span> <span class="tok-fn">Float32Array</span>(<span class="tok-var">event</span>.<span class="tok-var">data</span>);
+      <span class="tok-fn">onFrame</span>(<span class="tok-var">buffer</span> <span class="tok-kw">as unknown as</span> <span class="tok-type">T</span>);
+    };
+
+    <span class="tok-var">socketRef</span>.<span class="tok-var">current</span> = <span class="tok-var">ws</span>;
+    <span class="tok-kw">return</span> () =&gt; <span class="tok-var">ws</span>.<span class="tok-fn">close</span>();
+  }, [<span class="tok-var">endpoint</span>, <span class="tok-var">onFrame</span>]);
+}</code></pre>
+              <div class="run-output" style="display: none; padding: 12px; margin-top: 14px; background: rgba(0, 240, 255, 0.05); border-left: 3px solid #00f0ff; font-size: 0.84rem;"></div>
+            </div>
+
+            <!-- Code Tab 2 -->
+            <div class="code-block" id="code-rust">
+              <pre><code><span class="tok-kw">use</span> <span class="tok-var">std</span>::<span class="tok-var">sync</span>::<span class="tok-var">atomic</span>::{<span class="tok-type">AtomicUsize</span>, <span class="tok-type">Ordering</span>};
+
+<span class="tok-cm">// Lock-free circular ring buffer for microsecond tick matching</span>
+<span class="tok-kw">pub struct</span> <span class="tok-type">LockFreeRingBuffer</span>&lt;<span class="tok-type">T</span>, <span class="tok-kw">const</span> <span class="tok-type">CAP</span>: <span class="tok-type">usize</span>&gt; {
+    <span class="tok-var">buffer</span>: [<span class="tok-type">Option</span>&lt;<span class="tok-type">T</span>&gt;; <span class="tok-type">CAP</span>],
+    <span class="tok-var">head</span>: <span class="tok-type">AtomicUsize</span>,
+    <span class="tok-var">tail</span>: <span class="tok-type">AtomicUsize</span>,
+}
+
+<span class="tok-kw">impl</span>&lt;<span class="tok-type">T</span>: <span class="tok-type">Copy</span>, <span class="tok-kw">const</span> <span class="tok-type">CAP</span>: <span class="tok-type">usize</span>&gt; <span class="tok-type">LockFreeRingBuffer</span>&lt;<span class="tok-type">T</span>, <span class="tok-type">CAP</span>&gt; {
+    <span class="tok-kw">pub fn</span> <span class="tok-fn">push</span>(&amp;<span class="tok-kw">mut self</span>, <span class="tok-var">item</span>: <span class="tok-type">T</span>) -&gt; <span class="tok-type">Result</span>&lt;(), &amp;<span class="tok-type">'static</span> <span class="tok-type">str</span>&gt; {
+        <span class="tok-kw">let</span> <span class="tok-var">current_head</span> = <span class="tok-kw">self</span>.<span class="tok-var">head</span>.<span class="tok-fn">load</span>(<span class="tok-type">Ordering</span>::<span class="tok-type">Relaxed</span>);
+        <span class="tok-kw">self</span>.<span class="tok-var">buffer</span>[<span class="tok-var">current_head</span> % <span class="tok-type">CAP</span>] = <span class="tok-type">Some</span>(<span class="tok-var">item</span>);
+        <span class="tok-kw">self</span>.<span class="tok-var">head</span>.<span class="tok-fn">store</span>(<span class="tok-var">current_head</span> + <span class="tok-num">1</span>, <span class="tok-type">Ordering</span>::<span class="tok-type">Release</span>);
+        <span class="tok-type">Ok</span>(())
+    }
+}</code></pre>
+              <div class="run-output" style="display: none; padding: 12px; margin-top: 14px; background: rgba(0, 240, 255, 0.05); border-left: 3px solid #00f0ff; font-size: 0.84rem;"></div>
+            </div>
+
+            <!-- Code Tab 3 -->
+            <div class="code-block" id="code-python">
+              <pre><code><span class="tok-kw">from</span> <span class="tok-var">fastapi</span> <span class="tok-kw">import</span> <span class="tok-var">FastAPI</span>
+<span class="tok-kw">from</span> <span class="tok-var">fastapi.responses</span> <span class="tok-kw">import</span> <span class="tok-var">StreamingResponse</span>
+<span class="tok-kw">import</span> <span class="tok-var">asyncio</span>
+
+<span class="tok-var">app</span> = <span class="tok-fn">FastAPI</span>(<span class="tok-var">title</span>=<span class="tok-str">"Triton Inference Gateway"</span>)
+
+<span class="tok-kw">async def</span> <span class="tok-fn">stream_token_generator</span>(<span class="tok-var">prompt</span>: <span class="tok-type">str</span>):
+    <span class="tok-cm"># Asynchronous generator pushing tokens via SSE with zero-lag buffering</span>
+    <span class="tok-kw">for</span> <span class="tok-var">chunk</span> <span class="tok-kw">in</span> <span class="tok-fn">inference_engine</span>(<span class="tok-var">prompt</span>):
+        <span class="tok-kw">yield</span> <span class="tok-str">f"data: {chunk.json()}\n\n"</span>
+        <span class="tok-kw">await</span> <span class="tok-var">asyncio</span>.<span class="tok-fn">sleep</span>(<span class="tok-num">0.005</span>)
+
+<span class="tok-op">@</span><span class="tok-var">app</span>.<span class="tok-fn">post</span>(<span class="tok-str">"/v1/infer/stream"</span>)
+<span class="tok-kw">async def</span> <span class="tok-fn">infer</span>(<span class="tok-var">payload</span>: <span class="tok-type">InferencePayload</span>):
+    <span class="tok-kw">return</span> <span class="tok-fn">StreamingResponse</span>(<span class="tok-fn">stream_token_generator</span>(<span class="tok-var">payload</span>.<span class="tok-var">prompt</span>), <span class="tok-var">media_type</span>=<span class="tok-str">"text/event-stream"</span>)</code></pre>
+              <div class="run-output" style="display: none; padding: 12px; margin-top: 14px; background: rgba(0, 240, 255, 0.05); border-left: 3px solid #00f0ff; font-size: 0.84rem;"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAREER TIMELINE & EXPERIENCE -->
+    <section class="experience-section" id="experience">
+      <div class="container">
+        <div class="section-header reveal-init">
+          <div class="section-tag">DEVELOPMENT JOURNEY</div>
+          <h2 class="section-title">Learning by <span class="gradient-text">Building</span></h2>
+          <p class="section-desc">A practical path through Computer Engineering, web development, projects, experimentation, and continuous improvement.</p>
+        </div>
+
+        <div class="timeline-wrapper">
+          <div class="timeline-line"></div>
+
+          <!-- Role 1 -->
+          <div class="timeline-item reveal-init">
+            <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+            <div class="timeline-card" data-tilt>
+              <div class="timeline-header">
+                <h3 class="timeline-role">Full-Stack Development Focus</h3>
+                  <span class="timeline-period">CURRENT</span>
+              </div>
+              <div class="timeline-company">Learning + Building • Pune, India</div>
+              <ul class="timeline-bullets">
+                <li>Building practical applications across frontend and backend technologies.</li>
+                <li>Currently learning React, advanced Python, Flask, REST APIs, and full-stack development.</li>
+                <li>Exploring AI-assisted development, automation, and interactive digital experiences.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Role 2 -->
+          <div class="timeline-item reveal-init">
+            <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+            <div class="timeline-card" data-tilt>
+              <div class="timeline-header">
+                <h3 class="timeline-role">Smart Campus Management System</h3>
+                  <span class="timeline-period">FEATURED PROJECT</span>
+              </div>
+              <div class="timeline-company">Frontend / Teacher & Student Module</div>
+              <ul class="timeline-bullets">
+                <li>Created teacher and student interfaces for classroom occupancy, allocation, attendance, and notifications.</li>
+                <li>Worked on attendance management and analytics views.</li>
+                <li>Contributed frontend development and Flask-based integration.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Role 3 -->
+          <div class="timeline-item reveal-init">
+            <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+            <div class="timeline-card" data-tilt>
+              <div class="timeline-header">
+                <h3 class="timeline-role">AI-Assisted Developer</h3>
+                  <span class="timeline-period">ONGOING PRACTICE</span>
+              </div>
+              <div class="timeline-company">GitHub Copilot & AI Development Workflows</div>
+              <ul class="timeline-bullets">
+                <li>Use AI tools to understand unfamiliar code and troubleshoot errors.</li>
+                <li>Use assisted workflows to develop features and prototype ideas faster.</li>
+                <li>Keep learning through experimentation, testing, and iteration.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Role 4 -->
+          <div class="timeline-item reveal-init">
+            <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+            <div class="timeline-card" data-tilt>
+              <div class="timeline-header">
+                <h3 class="timeline-role">Computer Engineering Student</h3>
+                  <span class="timeline-period">ONGOING</span>
+              </div>
+              <div class="timeline-company">Computer Engineering • Pune, India</div>
+              <ul class="timeline-bullets">
+                <li>Strengthening foundations in C, C++, JavaScript, Python, SQL, HTML, and CSS.</li>
+                <li>Developing skills in object-oriented programming, data structures, algorithms, databases, and basic machine learning.</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS & ENDORSEMENTS -->
+    <section class="testimonials-section" id="testimonials">
+      <div class="container">
+        <div class="section-header reveal-init">
+          <div class="section-tag">PROGRAMMING STRENGTHS</div>
+          <h2 class="section-title">How I Approach <span class="gradient-text">Development</span></h2>
+          <p class="section-desc">The habits and interests guiding my growth as an emerging developer.</p>
+        </div>
+
+        <div class="testimonials-grid">
+          
+          <div class="testimonial-card reveal-init" data-tilt>
+            <p class="t-quote">
+              "I break complex programming problems into manageable solutions and keep iterating until the idea becomes useful."
+            </p>
+            <div class="t-author">
+                <div class="t-avatar">01</div>
+              <div>
+                <div class="t-name">Problem Solving</div>
+                <div class="t-role">Turning challenges into practical steps</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card reveal-init" data-tilt>
+            <p class="t-quote">
+              "I learn by building actual applications, experimenting with new tools, and connecting what I study to real interfaces and workflows."
+            </p>
+            <div class="t-author">
+                <div class="t-avatar">02</div>
+              <div>
+                <div class="t-name">Practical Development</div>
+                <div class="t-role">Learning through real applications</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card reveal-init" data-tilt>
+            <p class="t-quote">
+              "I am interested in the full journey: frontend experience, backend functionality, databases, automation, and the creative possibilities of AI."
+            </p>
+            <div class="t-author">
+                <div class="t-avatar">03</div>
+              <div>
+                <div class="t-name">Full-Stack Mindset</div>
+                <div class="t-role">Frontend, backend, and beyond</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE CONTACT & INQUIRY GUI HUB -->
+    <section class="contact-section" id="contact">
+      <div class="container">
+        <div class="section-header reveal-init">
+          <div class="section-tag">GET IN TOUCH</div>
+          <h2 class="section-title">Let’s Build Something <span class="gradient-text">Useful</span></h2>
+          <p class="section-desc">I’m open to learning opportunities, project collaboration, feedback, and conversations about web development, AI, and automation.</p>
+        </div>
+
+        <div class="contact-grid">
+          
+          <!-- Contact Details & Status Card -->
+          <div class="contact-info-card reveal-init" data-tilt>
+            <div class="contact-status-strip">
+              <span class="pulse-dot"></span>
+              <div>
+                <div style="font-size: 0.76rem; color: #64748b; text-transform: uppercase;">Current Local Time & Availability</div>
+                <div class="clock-val" id="utc-clock">Loading local time...</div>
+              </div>
+            </div>
+
+            <h3 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 12px;">Direct Communication</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">
+              Whether you want to discuss a project, share feedback, or connect around development and technology, I’d be glad to hear from you.
+            </p>
+
+            <div class="contact-links-list">
+                <a href="mailto:sohamchavan207260@gmail.com" class="contact-link-row">
+                <span class="c-icon">✉</span>
+                <div>
+                  <div class="c-label">Direct Email</div>
+                  <div class="c-value">sohamchavan207260@gmail.com</div>
+                </div>
+              </a>
+
+              <a href="https://github.com/SOHAM830-star" target="_blank" rel="noopener" class="contact-link-row">
+                <span class="c-icon">🐙</span>
+                <div>
+                  <div class="c-label">GitHub Source</div>
+                  <div class="c-value">github.com/SOHAM830-star</div>
+                </div>
+              </a>
+
+              <a href="https://www.linkedin.com/in/soham-chavan-83034b37a" target="_blank" rel="noopener" class="contact-link-row">
+                <span class="c-icon">💼</span>
+                <div>
+                  <div class="c-label">LinkedIn Profile</div>
+                  <div class="c-value">linkedin.com/in/soham-chavan-83034b37a</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Interactive Collaboration & Hiring Form -->
+          <div class="contact-form-wrapper reveal-init" data-tilt>
+            <form id="portfolio-contact-form">
+              <div class="form-group">
+                <label for="form-name" class="form-label">Full Name or Organization *</label>
+                <input type="text" id="form-name" class="form-control" placeholder="e.g. Elena Rostova / Vanguard AI Labs" required>
+              </div>
+
+              <div class="form-row-2col">
+                <div class="form-group">
+                  <label for="form-email" class="form-label">Email Address *</label>
+                  <input type="email" id="form-email" class="form-control" placeholder="elena@vanguard.io" required>
+                </div>
+                <div class="form-group">
+                  <label for="form-phone" class="form-label">Phone / WhatsApp Number</label>
+                  <input type="tel" id="form-phone" class="form-control" placeholder="+91 ...">
+                </div>
+              </div>
+
+              <div class="form-row-2col">
+                <div class="form-group">
+                  <label for="form-role" class="form-label">Engagement / Role Scope</label>
+                  <select id="form-role" class="form-control">
+                    <option value="Project Collaboration">Project Collaboration</option>
+                    <option value="Learning Opportunity">Learning Opportunity</option>
+                    <option value="Frontend / Full-Stack Development">Frontend / Full-Stack Development</option>
+                    <option value="AI-Assisted Development">AI-Assisted Development</option>
+                    <option value="Feedback or Mentorship">Feedback or Mentorship</option>
+                    <option value="General Conversation">General Conversation</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="form-portfolio" class="form-label">Portfolio, GitHub, or LinkedIn</label>
+                  <input type="url" id="form-portfolio" class="form-control" placeholder="https://github.com/SOHAM830-star">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="form-budget" class="form-label">Target Timeline & Proposed Budget / Compensation</label>
+                <input type="text" id="form-budget" class="form-control" placeholder="e.g. Q4 2026 start &bull; $180k-$240k / $150/hr">
+              </div>
+
+              <div class="form-group">
+                <label for="form-message" class="form-label">Message / Project Proposal *</label>
+                <textarea id="form-message" class="form-control" placeholder="Describe the architectural challenge, project requirements, or what you'd like to collaborate on..." required></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <span>Send Message & Generate Dossier</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+
+              <div class="form-success-banner" id="form-success-banner">
+                🎉 Message received! Your inquiry has been added to the project ledger.
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- PROJECT DETAIL DEEP-DIVE MODAL -->
+  <div class="modal-backdrop" id="project-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);">// SYSTEM ARCHITECTURE SPECIFICATION</div>
+        <button class="modal-close-btn" id="modal-close" aria-label="Close Project Modal">✕</button>
+      </div>
+      <div class="modal-content-inner" id="modal-dynamic-content">
+        <!-- Injected dynamically by ModalManager -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN SUBMISSIONS & INQUIRIES VAULT MODAL -->
+  <div class="modal-backdrop" id="vault-modal">
+    <div class="modal-container" style="max-width: 1060px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-family: var(--font-mono); font-size: 0.84rem; color: var(--accent-cyan); font-weight: 700;">
+            📁 CANDIDATE INQUIRIES & WORK LEDGER
+          </div>
+          <span class="vault-live-pill">● LIVE BACKEND</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <a href="/api/export/csv" class="vault-download-btn" id="export-excel-btn" download title="Download Excel Spreadsheet">
+            <span>📊 Export to Excel (.csv)</span>
+          </a>
+          <button class="modal-close-btn" id="vault-close" aria-label="Close Vault Modal">✕</button>
+        </div>
+      </div>
+      <div class="modal-content-inner">
+        <div class="vault-info-banner">
+          All collaboration inquiries and employment applications are automatically compiled into universal <strong>Microsoft Excel spreadsheets (.csv)</strong> and formatted <strong>Word dossiers (.doc)</strong>.
+        </div>
+
+        <div class="vault-table-wrapper" id="vault-table-wrapper">
+          <div id="vault-empty-state" class="vault-empty">
+            <span style="font-size: 2rem;">📭</span>
+            <h4>No Inquiries Received Yet</h4>
+            <p>Submissions sent through the contact hub will populate here in real-time with instant Excel & Word export links.</p>
+          </div>
+
+          <table class="vault-table" id="vault-table" style="display: none;">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Candidate / Org</th>
+                <th>Role Scope</th>
+                <th>Contact Info</th>
+                <th>Portfolio / Links</th>
+                <th>Budget / Rate</th>
+                <th>Dossier</th>
+              </tr>
+            </thead>
+            <tbody id="vault-table-body">
+              <!-- Dynamically populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <a href="#hero" class="nav-brand">
+          <span class="brand-mark">SC</span>
+          <span class="brand-name">Soham A. Chavan</span>
+        </a>
+
+        <button class="back-to-top" id="back-to-top" title="Scroll to Top" aria-label="Back to Top">
+          ↑
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/particles.js"></script>
+  <script src="js/tilt.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
