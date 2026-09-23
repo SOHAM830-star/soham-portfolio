@@ -1,34 +1,24 @@
-/**
- * Portfolio Collaboration & Application Backend Server
- * Handles static asset serving, inquiry processing, Excel (.csv) ledger generation,
- * and Microsoft Word (.doc) candidate profile dossiers.
- */
-
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const url = require('url');
+const crypto = require('crypto');
+const inquiryStorage = require('./storage/inquiry-storage');
+const { initializeDatabase, closeDatabase } = require('./db/database');
 
-const PORT = process.env.PORT || 3000;
-const DATA_DIR = path.join(__dirname, 'data');
-const DOSSIERS_DIR = path.join(DATA_DIR, 'dossiers');
-const CSV_FILE = path.join(DATA_DIR, 'inquiries.csv');
-const JSON_FILE = path.join(DATA_DIR, 'inquiries.json');
-
-// Ensure storage directories exist
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-if (!fs.existsSync(DOSSIERS_DIR)) fs.mkdirSync(DOSSIERS_DIR, { recursive: true });
-
-// Ensure inquiries.json exists
-if (!fs.existsSync(JSON_FILE)) {
-  fs.writeFileSync(JSON_FILE, JSON.stringify([], null, 2), 'utf8');
-}
-
-// Ensure CSV file exists with UTF-8 BOM for Microsoft Excel auto-detection
-if (!fs.existsSync(CSV_FILE)) {
-  const csvHeader = '\uFEFF"Inquiry ID","Submission Date","Full Name","Email Address","Phone / WhatsApp","Engagement Type","Portfolio / Profile","Budget / Rate","Message / Proposal"\r\n';
-  fs.writeFileSync(CSV_FILE, csvHeader, 'utf8');
-}
+const PORT = Number(process.env.PORT) || 3000;
+const MAX_BODY_BYTES = 32 * 1024;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+const rateLimitStore = new Map();
+const rateLimitCleanup = setInterval(() => {
+  const cutoff = Date.now() - RATE_LIMIT_WINDOW_MS;
+  for (const [key, timestamps] of rateLimitStore) {
+    const current = timestamps.filter(timestamp => timestamp > cutoff);
+    if (current.length) rateLimitStore.set(key, current);
+    else rateLimitStore.delete(key);
+  }
+}, RATE_LIMIT_WINDOW_MS);
+rateLimitCleanup.unref();
 
 // MIME Types Map
 const MIME_TYPES = {
@@ -45,313 +35,244 @@ const MIME_TYPES = {
   '.doc': 'application/msword; charset=utf-8',
 };
 
-// Helper: Escape CSV fields safely
-function escapeCsv(field) {
-  if (field === null || field === undefined) return '""';
-  const str = String(field).replace(/"/g, '""');
-  return `"${str}"`;
+function sendJson(res, statusCode, payload, extraHeaders = {}) {
+  const body = JSON.stringify(payload);
+  res.writeHead(statusCode, { 'Content-Type': 'application/json; charset=utf-8', ...extraHeaders });
+  res.end(body);
 }
 
-// Helper: Generate a beautifully formatted Word (.doc) candidate profile
-function generateWordDoc(inquiry) {
-  const safeName = (inquiry.name || 'Candidate').replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `Candidate_${inquiry.id}_${safeName}.doc`;
-  const filePath = path.join(DOSSIERS_DIR, filename);
-
-  const htmlDoc = `<!DOCTYPE html>
-<html xmlns:o="urn:schemas-microsoft-com:office:office"
-      xmlns:w="urn:schemas-microsoft-com:office:word"
-      xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-  <meta charset="utf-8">
-  <title>Candidate Dossier - ${inquiry.name}</title>
-  <!--[if gte mso 9]>
-  <xml>
-    <w:WordDocument>
-      <w:View>Print</w:View>
-      <w:Zoom>100</w:Zoom>
-      <w:DoNotOptimizeForBrowser/>
-    </w:WordDocument>
-  </xml>
-  <![endif]-->
-  <style>
-    body {
-      font-family: 'Segoe UI', Calibri, Arial, sans-serif;
-      margin: 40px;
-      color: #1a202c;
-      background: #ffffff;
-      line-height: 1.6;
-    }
-    .header-box {
-      border-bottom: 3px solid #00b4d8;
-      padding-bottom: 18px;
-      margin-bottom: 24px;
-    }
-    .brand {
-      color: #0077b6;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-    h1 {
-      margin: 6px 0;
-      font-size: 26px;
-      color: #0f172a;
-    }
-    .meta-tag {
-      display: inline-block;
-      background: #e0f2fe;
-      color: #0369a1;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-weight: 600;
-      font-size: 12px;
-      margin-top: 4px;
-    }
-    .details-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 24px;
-    }
-    .details-table th, .details-table td {
-      border: 1px solid #cbd5e1;
-      padding: 10px 14px;
-      font-size: 14px;
-      text-align: left;
-    }
-    .details-table th {
-      background: #f8fafc;
-      width: 25%;
-      color: #475569;
-    }
-    .details-table td {
-      color: #0f172a;
-      font-weight: 500;
-    }
-    .message-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-left: 4px solid #00b4d8;
-      padding: 18px;
-      border-radius: 4px;
-      font-size: 14px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
-    .footer {
-      margin-top: 36px;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 12px;
-      font-size: 11px;
-      color: #94a3b8;
-      text-align: right;
-    }
-  </style>
-</head>
-<body>
-  <div class="header-box">
-    <div class="brand">NEXUS LABS &bull; EXECUTIVE CANDIDATE DOSSIER</div>
-    <h1>${inquiry.name}</h1>
-    <span class="meta-tag">${inquiry.role || 'General Collaboration'}</span>
-    <span style="font-size: 12px; color: #64748b; margin-left: 14px;">ID: ${inquiry.id} &bull; Received: ${inquiry.timestamp}</span>
-  </div>
-
-  <table class="details-table">
-    <tr>
-      <th>Email Address</th>
-      <td><a href="mailto:${inquiry.email}">${inquiry.email}</a></td>
-    </tr>
-    <tr>
-      <th>Phone / WhatsApp</th>
-      <td>${inquiry.phone || 'Not provided'}</td>
-    </tr>
-    <tr>
-      <th>Engagement Scope</th>
-      <td>${inquiry.role || 'Not specified'}</td>
-    </tr>
-    <tr>
-      <th>Portfolio / Profile</th>
-      <td>${inquiry.portfolio ? `<a href="${inquiry.portfolio}">${inquiry.portfolio}</a>` : 'Not provided'}</td>
-    </tr>
-    <tr>
-      <th>Target Timeline & Budget</th>
-      <td>${inquiry.budget || 'Flexible / Negotiable'}</td>
-    </tr>
-  </table>
-
-  <h3 style="color: #1e293b; font-size: 16px; margin-bottom: 10px;">Message & Architectural Proposal</h3>
-  <div class="message-box">${inquiry.message || 'No additional notes provided.'}</div>
-
-  <div class="footer">
-    Compiled automatically by Portfolio Inquiries Gateway &bull; Alex Carter Engineering &bull; ${new Date().toUTCString()}
-  </div>
-</body>
-</html>`;
-
-  fs.writeFileSync(filePath, htmlDoc, 'utf8');
-  return filename;
+function getClientKey(req) {
+  return (req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
 }
 
-// Server Request Handler
-const server = http.createServer((req, res) => {
-  const parsedUrl = url.parse(req.url, true);
-  const pathname = parsedUrl.pathname;
+function isRateLimited(req) {
+  const now = Date.now();
+  const timestamps = (rateLimitStore.get(getClientKey(req)) || []).filter(timestamp => timestamp > now - RATE_LIMIT_WINDOW_MS);
+  timestamps.push(now);
+  rateLimitStore.set(getClientKey(req), timestamps);
+  return timestamps.length > RATE_LIMIT_MAX;
+}
 
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+function safeEqual(left, right) {
+  if (typeof left !== 'string' || typeof right !== 'string') return false;
+  const leftBuffer = Buffer.from(left);
+  const rightBuffer = Buffer.from(right);
+  return leftBuffer.length === rightBuffer.length && crypto.timingSafeEqual(leftBuffer, rightBuffer);
+}
 
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
+function sessionCookie(username) {
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret) return null;
+  const payload = Buffer.from(JSON.stringify({ username, issuedAt: Date.now() })).toString('base64url');
+  const signature = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+  return `admin_session=${payload}.${signature}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800${secure}`;
+}
+
+function hasValidSession(req) {
+  const cookieHeader = req.headers.cookie || '';
+  const session = cookieHeader.split(';').map(value => value.trim()).find(value => value.startsWith('admin_session='));
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!session || !secret) return false;
+  const value = session.slice('admin_session='.length);
+  const [payload, signature] = value.split('.');
+  if (!payload || !signature) return false;
+  const expected = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
+  if (!safeEqual(signature, expected)) return false;
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+    return parsed.username === process.env.ADMIN_USERNAME && Date.now() - parsed.issuedAt < 8 * 60 * 60 * 1000;
+  } catch (error) {
+    return false;
+  }
+}
+
+function hasValidBasicAuth(req) {
+  const header = req.headers.authorization || '';
+  if (!header.startsWith('Basic ')) return false;
+  try {
+    const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8');
+    const separator = decoded.indexOf(':');
+    return separator > 0 && safeEqual(decoded.slice(0, separator), process.env.ADMIN_USERNAME) && safeEqual(decoded.slice(separator + 1), process.env.ADMIN_PASSWORD);
+  } catch (error) {
+    return false;
+  }
+}
+
+function requireAdmin(req, res) {
+  if (hasValidSession(req) || hasValidBasicAuth(req)) return true;
+  sendJson(res, 401, { success: false, error: 'Admin authentication required.' }, { 'WWW-Authenticate': 'Basic realm="Portfolio admin"' });
+  return false;
+}
+
+function validateInquiry(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return { error: 'Request body must be a JSON object.' };
+  const required = (value, label, max) => {
+    if (typeof value !== 'string' || !value.trim()) return { error: `${label} is required.` };
+    const trimmed = value.trim();
+    if (trimmed.length > max) return { error: `${label} must be ${max} characters or fewer.` };
+    if (/[^\x09\x0A\x0D\x20-\uFFFF]/.test(trimmed)) return { error: `${label} contains invalid characters.` };
+    return { value: trimmed };
+  };
+  const optional = (value, max) => {
+    if (value === undefined || value === null || value === '') return '';
+    if (typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    return trimmed.length <= max && !/[\u0000-\u0008\u000B\u000C\u000E-\u001F<>"']/.test(trimmed) ? trimmed : null;
+  };
+
+  const name = required(data.name, 'Name', 120);
+  const email = required(data.email, 'Email', 254);
+  const subject = required(data.subject || data.role, 'Subject', 160);
+  const message = required(data.message, 'Message', 5000);
+  if (name.error || email.error || subject.error || message.error) return { error: (name.error || email.error || subject.error || message.error) };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value)) return { error: 'Please provide a valid email address.' };
+
+  const phone = optional(data.phone, 40);
+  const portfolio = optional(data.portfolio, 500);
+  const budget = optional(data.budget, 300);
+  if (phone === null || portfolio === null || budget === null) return { error: 'One or more optional fields are invalid or too long.' };
+  if (portfolio && !/^https?:\/\//i.test(portfolio)) return { error: 'Portfolio URL must use http or https.' };
+  return { value: { name: name.value, email: email.value, subject: subject.value, role: subject.value, message: message.value, phone, portfolio, budget } };
+}
+
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    let bytes = 0;
+    req.on('data', chunk => {
+      bytes += chunk.length;
+      if (bytes > MAX_BODY_BYTES) {
+        reject(Object.assign(new Error('Request body too large'), { statusCode: 413 }));
+        req.destroy();
+        return;
+      }
+      body += chunk;
+    });
+    req.on('end', () => {
+      try { resolve(JSON.parse(body)); } catch (error) { reject(Object.assign(new Error('Malformed JSON'), { statusCode: 400 })); }
+    });
+    req.on('error', reject);
+  });
+}
+
+const server = http.createServer(async (req, res) => {
+  let pathname;
+  try { pathname = decodeURIComponent(new URL(req.url, `http://${req.headers.host || 'localhost'}`).pathname); } catch (error) { sendJson(res, 400, { success: false, error: 'Invalid URL.' }); return; }
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'");
+
+  if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
+
+  if (pathname === '/api/admin/login' && req.method === 'POST') {
+    try {
+      const data = await readJsonBody(req);
+      const username = typeof data.username === 'string' ? data.username : '';
+      const password = typeof data.password === 'string' ? data.password : '';
+      const cookie = sessionCookie(username);
+      if (!cookie || !safeEqual(username, process.env.ADMIN_USERNAME) || !safeEqual(password, process.env.ADMIN_PASSWORD)) {
+        sendJson(res, 401, { success: false, error: 'Invalid admin credentials.' });
+        return;
+      }
+      sendJson(res, 200, { success: true }, { 'Set-Cookie': cookie });
+    } catch (error) {
+      sendJson(res, error.statusCode || 400, { success: false, error: error.statusCode === 413 ? 'Request body too large.' : 'Invalid login request.' });
+    }
     return;
   }
 
   // --- API ROUTE: POST /api/inquiries ---
   if (pathname === '/api/inquiries' && req.method === 'POST') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
-      try {
-        const data = JSON.parse(body);
-
-        if (!data.name || !data.email) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: false, error: 'Name and Email are required fields.' }));
-          return;
-        }
-
-        const now = new Date();
-        const timestamp = now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }) + ' (PST)';
-        const inquiryId = 'INQ-' + Date.now().toString(36).toUpperCase();
-
-        const inquiry = {
-          id: inquiryId,
-          timestamp: timestamp,
-          isoDate: now.toISOString(),
-          name: data.name.trim(),
-          email: data.email.trim(),
-          phone: (data.phone || '').trim(),
-          role: data.role || 'Full-Time Role',
-          portfolio: (data.portfolio || '').trim(),
-          budget: (data.budget || '').trim(),
-          message: (data.message || '').trim(),
-        };
-
-        // 1. Generate Word Document Dossier
-        const docFile = generateWordDoc(inquiry);
-        inquiry.dossierFile = docFile;
-
-        // 2. Append to inquiries.json
-        const rawJson = fs.readFileSync(JSON_FILE, 'utf8');
-        const list = JSON.parse(rawJson || '[]');
-        list.unshift(inquiry); // newest first
-        fs.writeFileSync(JSON_FILE, JSON.stringify(list, null, 2), 'utf8');
-
-        // 3. Append to Excel inquiries.csv
-        const csvLine = [
-          escapeCsv(inquiry.id),
-          escapeCsv(inquiry.timestamp),
-          escapeCsv(inquiry.name),
-          escapeCsv(inquiry.email),
-          escapeCsv(inquiry.phone),
-          escapeCsv(inquiry.role),
-          escapeCsv(inquiry.portfolio),
-          escapeCsv(inquiry.budget),
-          escapeCsv(inquiry.message)
-        ].join(',') + '\r\n';
-
-        fs.appendFileSync(CSV_FILE, csvLine, 'utf8');
-
-        // Respond with success
-        res.writeHead(201, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          success: true,
-          id: inquiryId,
-          message: 'Information received and dossiers compiled successfully.',
-          totalInquiries: list.length,
-          docFile: docFile
-        }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: false, error: 'Failed to process inquiry payload.' }));
-      }
-    });
+    if (isRateLimited(req)) { sendJson(res, 429, { success: false, error: 'Too many submissions. Please try again later.' }, { 'Retry-After': '900' }); return; }
+    if (!/^application\/json(?:;|$)/i.test(req.headers['content-type'] || '')) { sendJson(res, 415, { success: false, error: 'Content-Type must be application/json.' }); return; }
+    try {
+      const validation = validateInquiry(await readJsonBody(req));
+      if (validation.error) { sendJson(res, 400, { success: false, error: validation.error }); return; }
+      const now = new Date();
+      const inquiry = { id: `INQ-${Date.now().toString(36).toUpperCase()}`, timestamp: `${now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })} (PST)`, isoDate: now.toISOString(), ...validation.value };
+      const result = await inquiryStorage.createInquiry(inquiry);
+      sendJson(res, 201, { success: true, id: inquiry.id, message: 'Information received and dossiers compiled successfully.', totalInquiries: result.totalInquiries, docFile: result.inquiry.dossierFile });
+    } catch (error) {
+      console.error('[Inquiry submission error]', error);
+      sendJson(res, error.statusCode || 500, { success: false, error: error.statusCode === 413 ? 'Request body too large.' : error.statusCode === 400 ? error.message : 'Failed to process inquiry payload.' });
+    }
     return;
   }
 
   // --- API ROUTE: GET /api/inquiries ---
   if (pathname === '/api/inquiries' && req.method === 'GET') {
+    if (!requireAdmin(req, res)) return;
     try {
-      const rawJson = fs.readFileSync(JSON_FILE, 'utf8');
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(rawJson);
+      sendJson(res, 200, await inquiryStorage.getInquiries());
     } catch (err) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Failed to read inquiries.' }));
+      console.error('[Inquiry read error]', err);
+      sendJson(res, 500, { success: false, error: 'Failed to read inquiries.' });
     }
     return;
   }
 
   // --- API ROUTE: GET /api/export/csv ---
   if (pathname === '/api/export/csv' && req.method === 'GET') {
-    if (fs.existsSync(CSV_FILE)) {
-      const stat = fs.statSync(CSV_FILE);
+    if (!requireAdmin(req, res)) return;
+    try {
+      const csv = await inquiryStorage.getCsvContent();
       res.writeHead(200, {
         'Content-Type': 'text/csv; charset=utf-8',
         'Content-Disposition': 'attachment; filename="Candidate_Inquiries_Master.csv"',
-        'Content-Length': stat.size
+        'Content-Length': Buffer.byteLength(csv, 'utf8')
       });
-      fs.createReadStream(CSV_FILE).pipe(res);
-    } else {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('No CSV data available yet.');
+      res.end(csv);
+    } catch (error) {
+      console.error('[CSV export error]', error);
+      sendJson(res, 500, { success: false, error: 'Failed to export inquiries.' });
     }
     return;
   }
 
   // --- API ROUTE: GET /api/export/doc/:id ---
   if (pathname.startsWith('/api/export/doc/') && req.method === 'GET') {
-    const id = pathname.replace('/api/export/doc/', '').trim();
-    const rawJson = fs.readFileSync(JSON_FILE, 'utf8');
-    const list = JSON.parse(rawJson || '[]');
-    const item = list.find(i => i.id === id);
-
-    if (item && item.dossierFile) {
-      const docPath = path.join(DOSSIERS_DIR, item.dossierFile);
-      if (fs.existsSync(docPath)) {
-        const stat = fs.statSync(docPath);
+    if (!requireAdmin(req, res)) return;
+    const id = pathname.slice('/api/export/doc/'.length).trim();
+    try {
+      const dossier = await inquiryStorage.getDossier(id);
+      if (dossier && fs.existsSync(dossier.filePath)) {
+        const stat = fs.statSync(dossier.filePath);
+        const filename = path.basename(dossier.filePath);
         res.writeHead(200, {
           'Content-Type': 'application/msword; charset=utf-8',
-          'Content-Disposition': `attachment; filename="${item.dossierFile}"`,
+          'Content-Disposition': `attachment; filename="${filename}"`,
           'Content-Length': stat.size
         });
-        fs.createReadStream(docPath).pipe(res);
+        fs.createReadStream(dossier.filePath).on('error', error => console.error('[Dossier export error]', error)).pipe(res);
         return;
       }
+    } catch (error) {
+      console.error('[Dossier lookup error]', error);
     }
-
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Dossier document not found.');
+    sendJson(res, 404, { success: false, error: 'Dossier document not found.' });
     return;
   }
 
   // --- STATIC FILE SERVING ---
-  let filePath = path.join(__dirname, pathname === '/' ? 'index.html' : pathname);
-  
-  // Security check: ensure path is within current working directory
-  const normalizedPath = path.normalize(filePath);
-  if (!normalizedPath.startsWith(__dirname)) {
-    res.writeHead(403, { 'Content-Type': 'text/plain' });
+  if (pathname === '/.env' || pathname.startsWith('/.env.') || pathname === '/data' || pathname.startsWith('/data/')) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Not Found');
+    return;
+  }
+  const requestedPath = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
+  const normalizedPath = path.resolve(__dirname, requestedPath);
+  if (normalizedPath !== __dirname && !normalizedPath.startsWith(`${__dirname}${path.sep}`)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Forbidden');
     return;
   }
 
   fs.stat(normalizedPath, (err, stats) => {
     if (err || !stats.isFile()) {
-      res.writeHead(404, { 'Content-Type': 'text/html' });
+      res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end('<h1>404 Not Found</h1>');
       return;
     }
@@ -364,6 +285,17 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`[Backend Server] Portfolio & Inquiries Gateway running at http://localhost:${PORT}`);
-});
+async function startServer() {
+  try {
+    await initializeDatabase();
+    server.listen(PORT, () => {
+      console.log(`[Backend Server] Portfolio & Inquiries Gateway running at http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('[Database startup error]', error.message);
+    await closeDatabase().catch(() => {});
+    process.exitCode = 1;
+  }
+}
+
+startServer();

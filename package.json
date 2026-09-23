@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "soham-portfolio",
   "version": "1.0.0",
   "private": true,
@@ -6,9 +6,14 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "db:init": "node scripts/init-db.js",
+    "db:import-inquiries": "node scripts/import-inquiries.js"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "^8.23.0"
   }
 }

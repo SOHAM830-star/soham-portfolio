@@ -635,7 +635,7 @@ class ContactManager {
 
         // Refresh Vault Counter & List
         if (window.vaultManager) {
-          window.vaultManager.fetchInquiries();
+          window.vaultManager.fetchInquiries(false);
         }
       } else {
         alert(result.error || 'Failed to submit application.');
@@ -677,7 +677,8 @@ class VaultManager {
       });
     }
 
-    this.fetchInquiries();
+    // Do not prompt visitors for admin credentials during normal page load.
+    this.fetchInquiries(false);
   }
 
   open() {
@@ -685,7 +686,7 @@ class VaultManager {
     if (this.modal) {
       this.modal.classList.add('open');
       document.body.style.overflow = 'hidden';
-      this.fetchInquiries();
+      this.fetchInquiries(true);
     }
   }
 
@@ -696,9 +697,36 @@ class VaultManager {
     }
   }
 
-  async fetchInquiries() {
+  async login() {
+    const username = window.prompt('Admin username:');
+    if (!username) return false;
+    const password = window.prompt('Admin password:');
+    if (!password) return false;
+
     try {
-      const res = await fetch('/api/inquiries');
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      if (!response.ok) {
+        alert('Admin authentication failed.');
+        return false;
+      }
+      return true;
+    } catch (error) {
+      alert('Unable to reach the admin authentication endpoint.');
+      return false;
+    }
+  }
+
+  async fetchInquiries(allowLogin = false) {
+    try {
+      const res = await fetch('/api/inquiries', { credentials: 'same-origin' });
+      if (res.status === 401 && allowLogin && await this.login()) {
+        return this.fetchInquiries(false);
+      }
       if (!res.ok) return;
       const list = await res.json();
 
